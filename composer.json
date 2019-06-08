@@ -1,0 +1,35 @@
+{
+    "name": "zhanghongbo/swoft-bean",
+    "keywords": ["swfot","bean"],
+    "description": "分布式开发,重写swoft框架之 -- Bean 模块",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "zhanghongbo",
+            "email": "taobao1875@163.com"
+        }
+    ],
+    "minimum-stability":"dev",
+    "require": {
+        "php":">7.1.0",
+        "swoft-rewrite/swoft-annotation": "dev-master",
+        "swoft-rewrite/swoft-console": "dev-master"
+    },
+    "require-dev":{
+        "phpunit/phpunit":"^7.5"
+    },
+    "autoload":{
+        "psr-4":{
+            "SwoftRewrite\\Bean\\": "src/"
+        },
+        "files":[
+            "src/helper/Function.php"
+        ]
+    },
+    "autoload-dev":{
+        "psr-4":{
+            "SwoftRewrite\\Bead\\unit\\":"test/unit",
+            "SwfotRewrite\\Bean\\Testing\\":"test/testing"
+        }
+    }
+}
