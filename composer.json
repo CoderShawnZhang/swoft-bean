@@ -1,5 +1,5 @@
 {
-    "name": "zhanghongbo/swoft-bean",
+    "name": "swoft-rewrite/swoft-bean",
     "keywords": ["swfot","bean"],
     "description": "分布式开发,重写swoft框架之 -- Bean 模块",
     "license": "MIT",
