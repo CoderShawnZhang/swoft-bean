@@ -9,7 +9,8 @@
 namespace SwoftRewrite\Bean;
 
 
-use SwfotRewrite\Bean\Container;
+use SwoftRewrite\Bean\Container;
+use SwoftRewrite\Console\Console;
 
 class BeanFactory
 {
@@ -26,5 +27,15 @@ class BeanFactory
     public static function addParsers(array $parsers)
     {
         Container::getInstance()->addParsers($parsers);
+    }
+
+    public static function init()
+    {
+        Container::getInstance()->init();
+    }
+
+    public static function getBean(string $name)
+    {
+        return Container::getInstance()->get($name);
     }
 }
