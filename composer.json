@@ -23,7 +23,7 @@
             "SwoftRewrite\\Bean\\": "src/"
         },
         "files":[
-            "src/helper/Function.php"
+            "src/helper/Functions.php"
         ]
     },
     "autoload-dev":{
