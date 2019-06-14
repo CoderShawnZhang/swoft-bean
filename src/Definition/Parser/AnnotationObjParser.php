@@ -5,6 +5,7 @@
 namespace SwoftRewrite\Bean\Definition\Parser;
 
 use SwoftRewrite\Annotation\Annotation\Parser\Parser;
+use SwoftRewrite\Annotation\Annotation\Parser\ParserInterface;
 use SwoftRewrite\Bean\Definition\ObjectDefinition;
 
 class AnnotationObjParser extends ObjectParser
@@ -62,7 +63,7 @@ class AnnotationObjParser extends ObjectParser
         $methodInjects = [];
         $methodAllAnnotations = $classOneAnnotations['methods'] ?? [];
         foreach($methodAllAnnotations as $methodName => $methodOneAnnotations){
-            $methodAnnotations = $methodAllAnnotations['annotation'] ?? [];
+            $methodAnnotations = $methodOneAnnotations['annotation'] ?? [];
             $methodInject = $this->parseMethodAnnotations($classAry,$methodName,$methodAnnotations);
             if($methodInject){
                 $methodInjects[$methodName] = $methodInject;
@@ -102,12 +103,30 @@ class AnnotationObjParser extends ObjectParser
         }
     }
 
+    /**
+     * 处理每个组件的 注释解释器
+     *
+     * 将注解解释器返回的内容放到 ObjectDefinition 类里存放着所有组件的解释器。
+     *
+     * @param array $classAry
+     * @return null|ObjectDefinition
+     * @throws \Exception
+     */
     private function parseClassAnnotations(array $classAry)
     {
         [,,$classAnnotations]  = $classAry;
         $objectDefinition = null;
-
+//        ‌‌$classAnnotations
+//        ‌array (
+//            0 =>
+//          SwoftRewrite\Bean\Annotation\Mapping\Bean::__set_state(array(
+//              'name' => 'eventManager',
+//              'scope' => 'singleton',
+//              'alias' => '',
+//          )),
+//        )
         foreach($classAnnotations as $annotation){
+            //$annotationClass : ‌SwoftRewrite\Bean\Annotation\Mapping\Bean
             //$annotationClass : ‌Doctrine\Common\Annotations\Annotation\Target
             $annotationClass = get_class($annotation);
 
@@ -133,16 +152,45 @@ class AnnotationObjParser extends ObjectParser
         return $objectDefinition;
     }
 
-    private function parsePropertyAnnotations($classAry,$propertyName,$proAnnotations)
+    private function parsePropertyAnnotations(array $classAry,string $propertyName,array $proAnnotations)
     {
 
     }
 
-    private function parseMethodAnnotations($classAry,$methodName,$methodAnnotations)
+    private function parseMethodAnnotations(array $classAry,string $methodName,array $methodAnnotations)
     {
+        $methodInject = null;
 
+        foreach ($methodAnnotations as $methodAnnotation) {
+            $annotationClass = get_class($methodAnnotation);
+            if (!isset($this->parsers[$annotationClass])) {
+                continue;
+            }
+
+            $parserClassName  = $this->parsers[$annotationClass];
+            $annotationParser = $this->getAnnotationParser($classAry, $parserClassName);
+
+            $annotationParser->setMethodName($methodName);
+            $data = $annotationParser->parse(Parser::TYPE_METHOD, $methodAnnotation);
+
+            if (empty($data)) {
+                continue;
+            }
+
+            $definitions = $annotationParser->getDefinitions();
+            if ($definitions) {
+                $this->definitions = $this->mergeDefinitions($this->definitions, $definitions);
+            }
+        }
+
+        return $methodInject;
     }
-    /***/
+
+    /**
+     * @param array $classAry
+     * @param string $parserClassName
+     * @return ParserInterface
+     */
     private function getAnnotationParser(array $classAry,string $parserClassName)
     {
         [$className,$reflectionClass,$classAnnotations] = $classAry;

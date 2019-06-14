@@ -38,4 +38,14 @@ class BeanFactory
     {
         return Container::getInstance()->get($name);
     }
+
+    public static function getSingleton(string $name)
+    {
+        return Container::getInstance()->getSingleton($name);
+    }
+
+    public static function isSingleton(string $name): bool
+    {
+        return Container::getInstance()->isSingleton($name);
+    }
 }

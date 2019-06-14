@@ -19,6 +19,10 @@ use SwoftRewrite\Stdlib\Helper\ArrayHelper;
 class Container
 {
     public const INIT_METHOD = 'init';
+
+    /**
+     * @var Container $instance;
+     */
     public static $instance;
 
     private $definitions = [];
@@ -78,6 +82,39 @@ class Container
 
         //prototype
         return $this->newBean($objectDefintion->getName());
+    }
+
+    public function isSingleton(string $name)
+    {
+        if(isset($this->aliases[$name])){
+            $name = $this->aliases[$name];
+        }
+        return isset($this->singletonPool[$name]);
+    }
+
+    /**
+     * @param string $name
+     * @return mixed
+     * @throws \Exception
+     */
+    public function getSingleton(string $name)
+    {
+        if(isset($this->singletonPool[$name])){
+            return $this->singletonPool[$name];
+        }
+
+        if(isset($this->aliases[$name])){
+            $name = $this->aliases[$name];
+            return $this->singletonPool[$name];
+        }
+
+        $classNames = $this->classNames[$name] ?? [];
+        if($classNames){
+            $name = end($classNames);
+            return $this->singletonPool[$name];
+        }
+
+        throw new \Exception(sprintf('The singleton bean "%s" is not defined',$name));
     }
 
     public function addDefinitions(array $definitions)
